@@ -1,0 +1,19 @@
+# Copy to wrangler.toml, edit, then run `npx wrangler deploy` from this folder.
+name = "stamp-loupe-proxy"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+
+[vars]
+# The sites allowed to call the proxy, comma separated, with no trailing slash.
+ALLOWED_ORIGINS = "https://YOUR-USERNAME.github.io"
+# Models the proxy will use. Requests for any other model use the first one.
+ALLOWED_MODELS = "claude-opus-5-5,claude-sonnet-5-5,claude-haiku-5-5"
+# Upper limit on output tokens per request.
+MAX_TOKENS = "4096"
+
+# Secrets are not stored in this file. Set them with:
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put ACCESS_CODE      (optional, shared with people you trust)
+
+# Optional rate limiting. Cloudflare's rate limiting binding syntax has changed
+# over time; check the current Workers docs and bind it with the name LIMITER.

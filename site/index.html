@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stamp Loupe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Photograph a stamp or a whole album page. Stamp Loupe names each stamp, shows what its value rests on, and plans the sale.">
+<meta property="og:title" content="Stamp Loupe">
+<meta property="og:description" content="Know what your stamps are worth before you sell them. Open source, made for collectors.">
+<meta property="og:image" content="img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2b3ea6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 36'%3E%3Crect width='32' height='36' rx='3' fill='%232b3ea6'/%3E%3Cpath fill='%23f4f2ea' d='M16 18 10.4 8.4 16 11.4 21.6 8.4Z M16 18 25.6 12.4 22.6 18 25.6 23.6Z M16 18 21.6 27.6 16 24.6 10.4 27.6Z M16 18 6.4 23.6 9.4 18 6.4 12.4Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: an album page. The hero is one large perforated stamp, cancelled in red. Sections below sit on the album page; the Canadian section is mounted on a black stockbook strip. */
+:root {
+  --paper: #f2f3f7;
+  --card: #ffffff;
+  --sunk: #e8eaf1;
+  --ink: #141823;
+  --muted: #545e71;
+  --line: #d6dae5;
+  --engrave: #2b3ea6;
+  --engrave-deep: #1f2e85;
+  --engrave-ink: #f4f2ea;
+  --accent: #2b3ea6;
+  --accent-ink: #ffffff;
+  --cancel: #b0202d;
+  --good: #17704a;
+  --mount: #15171e;
+  --mount-ink: #eceef4;
+  --mount-dim: #a7aebf;
+  --stamp-paper: #fcfbf7;
+  --shadow: 0 1px 2px rgb(20 25 40 / 0.06), 0 14px 34px rgb(20 25 40 / 0.1);
+  --f-display: "Old Standard TT", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --f-body: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c0e13; --card: #151821; --sunk: #1c202b; --ink: #e8eaf1; --muted: #9ba3b5; --line: #2a2f3c;
+    --engrave: #3446b8; --engrave-deep: #24339a; --engrave-ink: #f1efe7; --accent: #98a6ff; --accent-ink: #0c0e13;
+    --cancel: #ff6b78; --good: #69d6a1; --mount: #06070a; --mount-ink: #e8eaf1; --mount-dim: #8d95a8; --stamp-paper: #e6e3db;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 14px 34px rgb(0 0 0 / 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c0e13; --card: #151821; --sunk: #1c202b; --ink: #e8eaf1; --muted: #9ba3b5; --line: #2a2f3c;
+  --engrave: #3446b8; --engrave-deep: #24339a; --engrave-ink: #f1efe7; --accent: #98a6ff; --accent-ink: #0c0e13;
+  --cancel: #ff6b78; --good: #69d6a1; --mount: #06070a; --mount-ink: #e8eaf1; --mount-dim: #8d95a8; --stamp-paper: #e6e3db;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 14px 34px rgb(0 0 0 / 0.45);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.6 var(--f-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+img { max-width: 100%; display: block; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 10px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 700 22px/1 var(--f-display); }
+.brand svg { flex: none; }
+.nav { display: flex; align-items: center; gap: 4px; }
+.nav a:not(.btn) { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 14.5px; padding: 8px 10px; border-radius: 6px; }
+@media (hover: hover) { .nav a:not(.btn):hover { color: var(--ink); background: var(--sunk); } }
+@media (max-width: 760px) { .nav a:not(.btn) { display: none; } }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 11px 18px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: 600 15px/1.1 var(--f-body); text-decoration: none; cursor: pointer; transition: transform 0.08s ease, background-color 0.15s, border-color 0.15s; }
+@media (hover: hover) { .btn:hover { border-color: var(--muted); } }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+@media (hover: hover) { .btn-primary:hover { background: var(--engrave-deep); border-color: var(--engrave-deep); color: #fff; } }
+.btn-small { min-height: 38px; padding: 8px 14px; font-size: 14px; }
+.btn-light { background: var(--stamp-paper); border-color: var(--stamp-paper); color: #141823; }
+@media (hover: hover) { .btn-light:hover { background: #ffffff; border-color: #ffffff; color: #141823; } }
+.btn-ghost { background: transparent; border-color: rgb(244 242 234 / 0.45); color: var(--engrave-ink); }
+@media (hover: hover) { .btn-ghost:hover { border-color: var(--engrave-ink); } }
+
+/* Hero: one large stamp */
+.hero { padding-block: 40px 56px; overflow-x: clip; }
+.hero .wrap { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); align-items: center; }
+@media (min-width: 920px) { .hero .wrap { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); } }
+.stamp { --r: 9px; position: relative; padding: calc(var(--r) * 2.4); background: radial-gradient(var(--r), #0000 97%, var(--stamp-paper)) round calc(var(--r) * -1.5) calc(var(--r) * -1.5) / calc(var(--r) * 3) calc(var(--r) * 3), linear-gradient(var(--stamp-paper) 0 0) 50% / calc(100% - var(--r) * 3) calc(100% - var(--r) * 3) no-repeat; filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.12)) drop-shadow(0 18px 30px rgb(20 25 40 / 0.16)); min-width: 0; }
+.stamp-face { position: relative; overflow: hidden; color: var(--engrave-ink); background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.075) 0 1px, transparent 1px 3px), var(--engrave); padding: clamp(28px, 5vw, 52px) clamp(22px, 4.5vw, 48px) 0; display: grid; gap: 18px; }
+.stamp-face::before { content: ""; position: absolute; inset: 10px; border: 1px solid rgb(244 242 234 / 0.38); pointer-events: none; }
+.tablet { position: absolute; top: 20px; right: 20px; font: 500 12px/1 var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; background: var(--stamp-paper); color: #1f2e85; padding: 7px 9px; border-radius: 3px; }
+.eyebrow { font: 600 12.5px/1.3 var(--f-body); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(244 242 234 / 0.82); max-width: 34ch; padding-right: 76px; }
+.hero h1 { font: 700 clamp(34px, 5.4vw, 60px)/1.04 var(--f-display); letter-spacing: -0.005em; text-wrap: balance; max-width: 17ch; }
+.hero .lede { font-size: clamp(16px, 1.7vw, 18.5px); line-height: 1.55; color: rgb(244 242 234 / 0.9); max-width: 46ch; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.fine-hero { font-size: 13.5px; color: rgb(244 242 234 / 0.72); }
+.legend { margin: 10px calc(-1 * clamp(22px, 4.5vw, 48px)) 0; border-top: 1px solid rgb(244 242 234 / 0.3); padding: 12px 0 14px; text-align: center; font: 700 clamp(15px, 2.2vw, 20px)/1 var(--f-display); letter-spacing: 0.32em; text-transform: uppercase; color: rgb(244 242 234 / 0.92); }
+.cancel { position: absolute; z-index: 2; width: clamp(84px, 11vw, 132px); bottom: -34px; right: -26px; color: var(--cancel); opacity: 0.88; transform: rotate(-14deg); mix-blend-mode: multiply; pointer-events: none; animation: strike 0.5s cubic-bezier(.2,.9,.3,1.2) 0.25s both; }
+:root[data-theme="dark"] .cancel { mix-blend-mode: normal; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cancel { mix-blend-mode: normal; } }
+@keyframes strike { from { transform: rotate(-14deg) scale(1.35); } to { transform: rotate(-14deg) scale(1); } }
+@media (max-width: 600px) { .cancel { right: -8px; bottom: -26px; } }
+
+.phone { justify-self: center; width: min(320px, 82vw); border-radius: 38px; padding: 10px; background: #0b0c10; box-shadow: var(--shadow), inset 0 0 0 1.5px #2c303b; }
+.phone img { border-radius: 29px; width: 100%; height: auto; aspect-ratio: 390 / 844; object-fit: cover; object-position: top; background: var(--sunk); }
+.phone-cap { text-align: center; font-size: 13.5px; color: var(--muted); margin-top: 12px; }
+
+/* Sections */
+section.band { padding-block: 64px; }
+.kicker { font: 600 12.5px/1.2 var(--f-body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--cancel); }
+.sec-head { display: grid; gap: 10px; max-width: 62ch; margin-bottom: 30px; }
+.sec-head h2 { font: 700 clamp(28px, 3.6vw, 42px)/1.1 var(--f-display); text-wrap: balance; }
+.sec-head p { color: var(--muted); font-size: 17px; }
+
+/* From album to sale: four steps in order */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); counter-reset: step; }
+.step { --r: 5px; padding: calc(var(--r) * 2.4); background: radial-gradient(var(--r), #0000 97%, var(--card)) round calc(var(--r) * -1.5) calc(var(--r) * -1.5) / calc(var(--r) * 3) calc(var(--r) * 3), linear-gradient(var(--card) 0 0) 50% / calc(100% - var(--r) * 3) calc(100% - var(--r) * 3) no-repeat; filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.14)); counter-increment: step; }
+.step-in { border: 1px solid var(--line); padding: 18px 16px 20px; height: 100%; display: grid; gap: 8px; align-content: start; }
+.step-in::before { content: counter(step); font: 700 34px/1 var(--f-display); color: var(--engrave); }
+:root[data-theme="dark"] .step-in::before { color: var(--accent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .step-in::before { color: var(--accent); } }
+.step h3 { font: 700 20px/1.2 var(--f-display); }
+.step p { color: var(--muted); font-size: 15px; }
+
+/* Feature rows */
+.features { display: grid; gap: 56px; }
+.feature { display: grid; gap: 28px; align-items: center; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 860px) { .feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; } .feature:nth-child(even) .feature-art { order: -1; } }
+.feature-text { display: grid; gap: 12px; max-width: 52ch; min-width: 0; }
+.feature h3 { font: 700 clamp(24px, 2.8vw, 32px)/1.15 var(--f-display); text-wrap: balance; }
+.feature p { color: var(--muted); font-size: 16.5px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.fact { font: 500 12.5px/1 var(--f-mono); padding: 7px 9px; border-radius: 4px; background: var(--sunk); color: var(--ink); }
+.feature-art { min-width: 0; display: grid; place-items: center; background: var(--mount); border-radius: 14px; padding: clamp(18px, 3vw, 30px); }
+.feature-art img { border-radius: 12px; max-height: 560px; width: auto; box-shadow: 0 12px 30px rgb(0 0 0 / 0.35); }
+
+/* Canadian rules: the stockbook strip */
+.strip { background: var(--mount); color: var(--mount-ink); padding-block: 60px; position: relative; }
+.strip::before, .strip::after { content: ""; position: absolute; left: 0; right: 0; height: 9px; background: linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0)); }
+.strip::before { top: 0; } .strip::after { bottom: 0; transform: scaleY(-1); }
+.strip .sec-head p { color: var(--mount-dim); }
+.strip .kicker { color: #ff8b95; }
+.rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
+.rules li { border-top: 1px solid rgb(255 255 255 / 0.16); padding-top: 14px; display: grid; gap: 6px; }
+.rules strong { font: 700 18px/1.25 var(--f-display); }
+.rules span { color: var(--mount-dim); font-size: 15px; }
+.rules code { font: 500 13px/1 var(--f-mono); background: rgb(255 255 255 / 0.1); padding: 2px 5px; border-radius: 3px; }
+
+/* Pricing */
+.prices { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); align-items: stretch; }
+.price { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px 20px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.price.lead { border-color: var(--accent); box-shadow: inset 0 3px 0 var(--accent); }
+.price h3 { font: 700 21px/1.2 var(--f-display); }
+.amount { font: 700 34px/1 var(--f-display); font-variant-numeric: lining-nums tabular-nums; }
+.amount small { font: 500 14px/1.3 var(--f-body); color: var(--muted); margin-left: 4px; }
+.price ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--muted); font-size: 15px; }
+.price-note { margin-top: 18px; color: var(--muted); font-size: 14.5px; max-width: 74ch; }
+.soon { display: inline-block; font: 600 11.5px/1 var(--f-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cancel); border: 1.5px solid currentColor; padding: 5px 7px; border-radius: 4px; transform: rotate(-2deg); justify-self: start; }
+
+/* Open source */
+.open { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 860px) { .open { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: start; } }
+.open-list { display: grid; gap: 14px; }
+.open-item { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-items: start; }
+.open-item svg { color: var(--good); margin-top: 3px; }
+.open-item p { color: var(--muted); }
+.open-item strong { color: var(--ink); display: block; font-size: 16.5px; }
+.code-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 12px; min-width: 0; }
+.code-card pre { margin: 0; overflow-x: auto; background: var(--sunk); border-radius: 8px; padding: 12px 14px; font: 400 13.5px/1.6 var(--f-mono); }
+
+/* Questions */
+.faq { display: grid; gap: 10px; max-width: 820px; }
+.faq details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 0 18px; }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 16px; font-weight: 600; font-size: 16.5px; min-height: 48px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: ""; flex: none; width: 9px; height: 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.15s; margin-right: 4px; }
+.faq details[open] summary::after { transform: rotate(-135deg); }
+.faq details p { color: var(--muted); padding-bottom: 16px; max-width: 70ch; }
+
+/* Sign-up */
+.signup { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: clamp(22px, 4vw, 36px); display: grid; gap: 16px; max-width: 760px; }
+.signup h2 { font: 700 clamp(26px, 3vw, 34px)/1.15 var(--f-display); }
+.signup form { display: flex; flex-wrap: wrap; gap: 10px; }
+.signup input[type="email"] { flex: 1 1 260px; min-width: 0; font: 16px/1.3 var(--f-body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; min-height: 48px; }
+.signup input[type="email"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+.consent { font-size: 13.5px; color: var(--muted); max-width: 70ch; }
+.form-msg { font-size: 15px; font-weight: 600; }
+.form-msg.ok { color: var(--good); }
+.form-msg.err { color: var(--cancel); }
+
+/* Footer */
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
+footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="maltese" viewBox="-10 -10 20 20"><path fill="currentColor" d="M0 0 L-5.6 -9.6 L0 -6.6 L5.6 -9.6 Z M0 0 L9.6 -5.6 L6.6 0 L9.6 5.6 Z M0 0 L5.6 9.6 L0 6.6 L-5.6 9.6 Z M0 0 L-9.6 5.6 L-6.6 0 L-9.6 -5.6 Z"/></symbol>
+  <symbol id="tick" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Stamp Loupe, back to the top">
+      <svg viewBox="0 0 32 36" width="26" height="30" aria-hidden="true" focusable="false">
+        <defs><mask id="perf" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="36"><rect width="32" height="36" fill="#fff"/><g fill="#000"><circle cx="4" cy="0" r="2.2"/><circle cx="10" cy="0" r="2.2"/><circle cx="16" cy="0" r="2.2"/><circle cx="22" cy="0" r="2.2"/><circle cx="28" cy="0" r="2.2"/><circle cx="4" cy="36" r="2.2"/><circle cx="10" cy="36" r="2.2"/><circle cx="16" cy="36" r="2.2"/><circle cx="22" cy="36" r="2.2"/><circle cx="28" cy="36" r="2.2"/><circle cx="0" cy="3" r="2.2"/><circle cx="0" cy="9" r="2.2"/><circle cx="0" cy="15" r="2.2"/><circle cx="0" cy="21" r="2.2"/><circle cx="0" cy="27" r="2.2"/><circle cx="0" cy="33" r="2.2"/><circle cx="32" cy="3" r="2.2"/><circle cx="32" cy="9" r="2.2"/><circle cx="32" cy="15" r="2.2"/><circle cx="32" cy="21" r="2.2"/><circle cx="32" cy="27" r="2.2"/><circle cx="32" cy="33" r="2.2"/></g></mask></defs>
+        <rect width="32" height="36" style="fill: var(--engrave)" mask="url(#perf)"/>
+        <use href="#maltese" x="9" y="11" width="14" height="14" style="color: var(--engrave-ink)"/>
+      </svg>
+      Stamp Loupe
+    </a>
+    <nav class="nav" aria-label="Page sections">
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#open">Open source</a>
+      <a href="#questions">Questions</a>
+      <a class="btn btn-primary btn-small" href="app/" data-app-link>Open the app</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="stamp">
+        <svg class="cancel" aria-hidden="true" focusable="false"><use href="#maltese"/></svg>
+        <div class="stamp-face">
+          <span class="tablet">3 free</span>
+          <p class="eyebrow">For collectors, and for families who inherit an album</p>
+          <h1 id="hero-title">Know what your stamps are worth before you sell them.</h1>
+          <p class="lede">Photograph one stamp or a whole album page. Stamp Loupe names each stamp and shows what its value rests on. Then it works out what you would keep after fees, postage and customs.</p>
+          <div class="cta">
+            <a class="btn btn-light" href="app/" data-app-link>Try it free</a>
+            <a class="btn btn-ghost" href="#signup">Get launch news</a>
+          </div>
+          <p class="fine-hero">Free with your own Claude account or API key. Paid plans open soon.</p>
+          <p class="legend" aria-hidden="true">Stamp Loupe</p>
+        </div>
+      </div>
+      <figure style="margin:0">
+        <div class="phone"><img src="img/hero-result.webp" alt="Stamp Loupe on a phone, showing a Canadian 1859 five cent Beaver identified, with a planning price taken from three sold prices" width="390" height="844"></div>
+        <figcaption class="phone-cap">A result: the stamp, its catalogue numbers, and a price built from real sales.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band" id="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">How it works</p>
+        <h2 id="how-title">From a box of albums to a sale, in four steps</h2>
+        <p>Most album stamps are common. The work is finding the few that are not, and selling those well.</p>
+      </div>
+      <ol class="steps">
+        <li class="step"><div class="step-in"><h3>Photograph the page</h3><p>One photo of an album or stockbook page. The app finds and crops every stamp on it.</p></div></li>
+        <li class="step"><div class="step-in"><h3>Sort it</h3><p>A quick pass flags the stamps worth a closer look, and spots the ones you already own.</p></div></li>
+        <li class="step"><div class="step-in"><h3>Identify the good ones</h3><p>A full look gives catalogue numbers, condition, measured centering, and a value with its sources.</p></div></li>
+        <li class="step"><div class="step-in"><h3>Plan the sale</h3><p>See what you would keep from eBay, HipStamp, Delcampe, an auction house, a dealer or a group lot.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" aria-label="Features" style="padding-top:8px">
+    <div class="wrap features">
+      <article class="feature">
+        <div class="feature-text">
+          <p class="kicker">The camera</p>
+          <h3>It waits for a sharp photo, then takes it for you</h3>
+          <p>Hold the phone over the stamp, the way a banking app photographs a cheque. When the stamp is square, in focus and free of glare, the photo is taken. It keeps the sharpest frame, straightens it, and measures the centering.</p>
+          <div class="facts"><span class="fact">Auto-capture</span><span class="fact">Glare check</span><span class="fact">Centering 0 to 100</span></div>
+        </div>
+        <div class="feature-art"><img src="img/feature-camera.webp" alt="The live camera guide with a stamp lined up in the frame and the focus, light and steady meters filled" loading="lazy" width="390" height="844"></div>
+      </article>
+      <article class="feature">
+        <div class="feature-text">
+          <p class="kicker">Page sort</p>
+          <h3>One photo of a page, every stamp on it sorted</h3>
+          <p>Each stamp gets a quick identification and a value band. The few worth a closer look are marked, with the reason. Identify those on their own, and save the rest as a list.</p>
+          <div class="facts"><span class="fact">Up to 30 stamps a sheet</span><span class="fact">Duplicate check</span></div>
+        </div>
+        <div class="feature-art"><img src="img/feature-page.webp" alt="A sorted album page: numbered stamps with value bands, two marked worth a closer look" loading="lazy" width="390" height="844"></div>
+      </article>
+      <article class="feature">
+        <div class="feature-text">
+          <p class="kicker">Values</p>
+          <h3>Every value says what it rests on</h3>
+          <p>An estimate names its sources, such as a catalogue, auction records or general knowledge. Add the prices similar stamps really sold for, and the planning price moves to their median. The evidence is rated Strong, Fair or Rough.</p>
+          <div class="facts"><span class="fact">Sold prices</span><span class="fact">Catalogue value</span><span class="fact">Research links</span></div>
+        </div>
+        <div class="feature-art"><img src="img/feature-value.webp" alt="The Value tab: the AI estimate with its sources, a catalogue value, and three recorded sold prices" loading="lazy" width="390" height="844"></div>
+      </article>
+      <article class="feature">
+        <div class="feature-text">
+          <p class="kicker">Selling</p>
+          <h3>A selling plan, worked out to the dollar</h3>
+          <p>Compare six ways to sell by what you would keep after fees and postage. Shipping is picked by value and destination, customs notes cover the buyer's country, and a listing draft is written for the channel you choose.</p>
+          <div class="facts"><span class="fact">eBay.ca</span><span class="fact">HipStamp</span><span class="fact">Delcampe</span><span class="fact">Auction</span><span class="fact">Dealer</span><span class="fact">Lot</span></div>
+        </div>
+        <div class="feature-art"><img src="img/feature-sell.webp" alt="The Sell tab ranking selling channels by what you keep, with the best fit highlighted" loading="lazy" width="390" height="844"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="strip" aria-labelledby="canada-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Canadian rules built in</p>
+        <h2 id="canada-title">Made for Canadian and British North America stamps</h2>
+        <p>It identifies stamps from any country. Canadian collectors also get the details other apps leave out.</p>
+      </div>
+      <ul class="rules">
+        <li><strong>Unitrade numbers</strong><span>Listed beside Scott and Stanley Gibbons, each marked likely or unsure.</span></li>
+        <li><strong>Where it was printed</strong><span>The 1851 pence issue and the 1859 decimals were printed in New York. Origin can matter at the border, so it is recorded.</span></li>
+        <li><strong>U.S. duty and customs</strong><span>Canadian-origin stamps sent to U.S. buyers face a 50% duty since August 22, 2026, and formal customs entry from October 22. The planner warns you.</span></li>
+        <li><strong>Canada Post and the Greene Foundation</strong><span>Postage by value and destination, and valuable BNA stamps pointed to the Greene Foundation for a certificate.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" id="pricing" aria-labelledby="pricing-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Pricing</p>
+        <h2 id="pricing-title">Pay for identifications. Everything else is free.</h2>
+        <p>The camera, photo checks, collection, selling planner and exports run on your phone and cost nothing. Identifications cost real money, so those are what you pay for. Credits never expire, and there are no weekly plans.</p>
+      </div>
+      <div class="prices">
+        <div class="price">
+          <h3>Free</h3>
+          <p class="amount">C$0</p>
+          <ul>
+            <li>Unlimited with your own Claude account or API key</li>
+            <li>Camera, collection, selling planner and exports</li>
+            <li>When accounts open: 3 full identifications and one page sort, no key needed</li>
+          </ul>
+        </div>
+        <div class="price">
+          <span class="soon">Opening soon</span>
+          <h3>Credit packs</h3>
+          <p class="amount">C$5<small>for 30 credits</small></p>
+          <ul>
+            <li>120 credits for C$15</li>
+            <li>500 credits for C$49</li>
+            <li>Credits never expire</li>
+          </ul>
+        </div>
+        <div class="price lead">
+          <span class="soon">Opening soon</span>
+          <h3>Collector</h3>
+          <p class="amount">C$7<small>a month, or C$59 a year</small></p>
+          <ul>
+            <li>50 credits every month</li>
+            <li>For collectors who add stamps every week</li>
+          </ul>
+        </div>
+        <div class="price">
+          <span class="soon">Opening soon</span>
+          <h3>Dealer</h3>
+          <p class="amount">C$29<small>a month</small></p>
+          <ul>
+            <li>300 credits every month</li>
+            <li>Overnight batches at half a credit each</li>
+          </ul>
+        </div>
+      </div>
+      <p class="price-note">One credit is one identification, or a sort of up to 30 stamps from one page photo. An expert identification uses two credits. Listing drafts are free for identified stamps. Prices are in Canadian dollars, before tax.</p>
+    </div>
+  </section>
+
+  <section class="band" id="open" aria-labelledby="open-title" style="padding-top:8px">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">Open source</p>
+        <h2 id="open-title">Read the code. Keep your collection.</h2>
+      </div>
+      <div class="open">
+        <div class="open-list">
+          <div class="open-item"><svg width="22" height="22" aria-hidden="true" focusable="false"><use href="#tick"/></svg><p><strong>Open under the MIT license</strong>Anyone can read the code, run their own copy, or improve it.</p></div>
+          <div class="open-item"><svg width="22" height="22" aria-hidden="true" focusable="false"><use href="#tick"/></svg><p><strong>Your collection stays on your device</strong>Stamps, notes and purchase details are stored on your phone or computer. Export a backup whenever you like.</p></div>
+          <div class="open-item"><svg width="22" height="22" aria-hidden="true" focusable="false"><use href="#tick"/></svg><p><strong>Photos go to Claude only when you ask</strong>An identification sends that photo to Anthropic's Claude to be read. Nothing else leaves the device.</p></div>
+          <div class="open-item"><svg width="22" height="22" aria-hidden="true" focusable="false"><use href="#tick"/></svg><p><strong>Works offline once installed</strong>Install it from your browser. The camera, collection and planner keep working without a connection.</p></div>
+        </div>
+        <div class="code-card">
+          <p><strong>Run your own copy</strong></p>
+          <pre><code>git clone <span data-repo-text>the repository</span>
+cd stamp-loupe
+npm ci
+npm test
+npm run build:site</code></pre>
+          <p><a href="#" data-repo-link>View the code on GitHub</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="questions" aria-labelledby="q-title" style="padding-top:8px">
+    <div class="wrap">
+      <div class="sec-head"><p class="kicker">Questions</p><h2 id="q-title">Before you start</h2></div>
+      <div class="faq">
+        <details><summary>How accurate is it?</summary><p>It is often right on common stamps and says so when it is unsure. Each result names what to check by hand, such as the perforation or watermark. Many stamps differ only by those details. For a valuable stamp, get an expert certificate before you sell.</p></details>
+        <details><summary>Do I need an account?</summary><p>Not to try it. Use it inside Claude with your own Claude account, or in your browser with your own Claude API key. Paid plans will add a sign-in, so you can use it without a key.</p></details>
+        <details><summary>What does a credit buy?</summary><p>One standard identification, or a sort of up to 30 stamps from one page photo. An expert identification uses two credits. Listing drafts come free with each identified stamp.</p></details>
+        <details><summary>Where do my photos and records go?</summary><p>Photos stay on your device until you ask for an identification. Then that photo goes to Anthropic's Claude to be read. Your collection, notes and purchase details stay on your device.</p></details>
+        <details><summary>Does it handle blocks, covers and postal history?</summary><p>Yes. Choose Block or Cover before you take the photo. A cover is valued as a whole item, including its postmarks and route.</p></details>
+        <details><summary>Can I sell through the app?</summary><p>Not directly. It writes the listing and works out where you would keep the most, and you post the listing yourself.</p></details>
+        <details><summary>Is it only for Canadian stamps?</summary><p>No. It identifies stamps from any country. It knows Canadian catalogues, postage and customs especially well.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="signup" aria-labelledby="signup-title" style="padding-top:8px">
+    <div class="wrap">
+      <div class="signup">
+        <p class="kicker">Launch list</p>
+        <h2 id="signup-title">Hear when paid plans open</h2>
+        <p>We will email you when paid plans open and when big features ship. A few emails a year at most.</p>
+        <form id="signup-form" method="post" novalidate>
+          <label class="vh" for="signup-email">Email address</label>
+          <input type="email" id="signup-email" name="email_address" autocomplete="email" placeholder="you@example.com" required>
+          <button type="submit" class="btn btn-primary" id="signup-btn">Join the list</button>
+        </form>
+        <p class="form-msg" id="signup-msg" role="status" hidden></p>
+        <p class="consent" id="consent">By joining, you agree to receive these emails from <span data-maker-name>the maker of Stamp Loupe</span>. Every email has an unsubscribe link, and you can leave at any time.<span data-contact></span></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Stamp Loupe<span data-maker-by></span>. Open source under the MIT license.</p>
+    <nav aria-label="Footer">
+      <a href="app/" data-app-link>Open the app</a>
+      <a href="#" data-repo-link>GitHub</a>
+      <a href="#" data-doc-link="docs/user-guide.md">User guide</a>
+      <a href="#" data-doc-link="docs/privacy.md">Privacy</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+// Settings for this page. Fill these in before you turn on the sign-up form.
+// CASL: the consent text must name who is asking and give a mailing address
+// plus an email or website. Kit adds your address to every email it sends.
+// The form stays closed until kitFormId, maker and mailingAddress are filled in.
+const SITE = {
+  repo: '',            // https://github.com/USERNAME/stamp-loupe (found automatically on github.io)
+  kitFormId: '',       // the number in your Kit form's address; blank keeps the form closed
+  maker: '',           // your name or business name, shown as the sender
+  contactEmail: '',    // shown with the consent text
+  mailingAddress: ''   // shown with the consent text, as CASL requires
+};
+
+(function () {
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  // On github.io the repository follows from the address: USERNAME.github.io/REPO/
+  let repo = SITE.repo;
+  const m = location.hostname.match(/^([a-z0-9-]+)\.github\.io$/i);
+  if (!repo && m) repo = 'https://github.com/' + m[1] + '/' + (location.pathname.split('/')[1] || 'stamp-loupe');
+  $$('[data-repo-link]').forEach(a => { if (repo) a.href = repo; else a.hidden = true; });
+  $$('[data-repo-text]').forEach(s => { s.textContent = repo ? repo + '.git' : 'https://github.com/USERNAME/stamp-loupe.git'; });
+  $$('[data-doc-link]').forEach(a => { if (repo) a.href = repo + '/blob/main/' + a.dataset.docLink; else a.hidden = true; });
+  if (SITE.maker) {
+    $$('[data-maker-name]').forEach(s => { s.textContent = SITE.maker + ', the maker of Stamp Loupe'; });
+    $$('[data-maker-by]').forEach(s => { s.textContent = ', by ' + SITE.maker; });
+  }
+  const contact = [SITE.mailingAddress, SITE.contactEmail].filter(Boolean).join(', ');
+  $$('[data-contact]').forEach(s => { s.textContent = contact ? ' Contact: ' + contact + '.' : ''; });
+
+  // Inside a Claude artifact this page is a preview: links to the app and the form stay inert.
+  let framed = false;
+  try { framed = window.self !== window.top; } catch (_) { framed = true; }
+  const preview = framed || !!(window.claude && typeof window.claude.use === 'function') || /claude\.ai$|claudeusercontent\.com$/.test(location.hostname);
+  const form = document.getElementById('signup-form');
+  const msg = document.getElementById('signup-msg');
+  const email = document.getElementById('signup-email');
+  const open = !!SITE.kitFormId && !!SITE.maker && !!SITE.mailingAddress && !preview;
+  if (open) form.action = 'https://app.convertkit.com/forms/' + encodeURIComponent(SITE.kitFormId) + '/subscriptions';
+  form.addEventListener('submit', e => {
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim());
+    if (!ok) {
+      e.preventDefault();
+      msg.hidden = false; msg.className = 'form-msg err';
+      msg.textContent = 'Enter an email address, such as you@example.com.';
+      email.focus();
+      return;
+    }
+    if (!open) {
+      e.preventDefault();
+      msg.hidden = false; msg.className = 'form-msg';
+      msg.textContent = preview ? 'This is a preview, so nothing was sent. The list opens on the live site.' : 'The list is not open yet. Please check back soon.';
+    }
+  });
+  if (preview) {
+    $$('[data-app-link]').forEach(a => { a.href = '#how'; });
+  }
+})();
+</script>
+</body>
+</html>

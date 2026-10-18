@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- app:head:start -->
+<title>Stamp Loupe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Photograph a postage stamp, block or cover. Get an identification, a value with its sources, and a plan for selling it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<!-- app:head:end -->
+<link rel="stylesheet" href="src/styles.css">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2b3ea6">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stamp Loupe">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+<body>
+<!-- app:body:start -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-maltese" viewBox="-10 -10 20 20"><path fill="currentColor" d="M0 0 L-5.6 -9.6 L0 -6.6 L5.6 -9.6 Z M0 0 L9.6 -5.6 L6.6 0 L9.6 5.6 Z M0 0 L5.6 9.6 L0 6.6 L-5.6 9.6 Z M0 0 L-9.6 5.6 L-6.6 0 L-9.6 -5.6 Z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H8l1.6-2.2h4.8L16 7h3.5A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.6"/></g></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/></g></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-torch" viewBox="0 0 24 24"><path d="M13 2 5 13.5h6L10 22l9-12h-6.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-turn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="7" width="10" height="13" rx="1"/><path d="M15 4.5a6 6 0 0 1 5 5.5M20 10l-2-1.2M20 10l1.2-2"/></g></symbol>
+  <symbol id="i-crop" viewBox="0 0 24 24"><path d="M7 3v14h14M3 7h14v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4.5h-4.5"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 2.8 19.5h18.4z"/><path d="M12 10v4.2M12 17h.01"/></g></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6h.01"/></g></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></g></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></g></symbol>
+  <symbol id="i-album" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.2"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.2"/></g></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="17.5" cy="5.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="18.5" r="2.5"/><path d="m8.7 10.7 6.6-3.9M8.7 13.3l6.6 3.9"/></g></symbol>
+  <symbol id="i-copies" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M16 5.5V5a1.5 1.5 0 0 0-1.5-1.5h-9A1.5 1.5 0 0 0 4 5v9.5A1.5 1.5 0 0 0 5.5 16H6"/></g></symbol>
+  <symbol id="i-install" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10M7.5 9.5 12 14l4.5-4.5"/><rect x="4" y="17" width="16" height="3.5" rx="1.2"/></g></symbol>
+</svg>
+
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#scan" id="brand">
+      <svg viewBox="0 0 32 36" width="26" height="30" aria-hidden="true" focusable="false">
+        <defs>
+          <mask id="logo-perf" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="36">
+            <rect width="32" height="36" fill="#fff"/>
+            <g fill="#000">
+              <circle cx="4" cy="0" r="2.2"/><circle cx="10" cy="0" r="2.2"/><circle cx="16" cy="0" r="2.2"/><circle cx="22" cy="0" r="2.2"/><circle cx="28" cy="0" r="2.2"/>
+              <circle cx="4" cy="36" r="2.2"/><circle cx="10" cy="36" r="2.2"/><circle cx="16" cy="36" r="2.2"/><circle cx="22" cy="36" r="2.2"/><circle cx="28" cy="36" r="2.2"/>
+              <circle cx="0" cy="3" r="2.2"/><circle cx="0" cy="9" r="2.2"/><circle cx="0" cy="15" r="2.2"/><circle cx="0" cy="21" r="2.2"/><circle cx="0" cy="27" r="2.2"/><circle cx="0" cy="33" r="2.2"/>
+              <circle cx="32" cy="3" r="2.2"/><circle cx="32" cy="9" r="2.2"/><circle cx="32" cy="15" r="2.2"/><circle cx="32" cy="21" r="2.2"/><circle cx="32" cy="27" r="2.2"/><circle cx="32" cy="33" r="2.2"/>
+            </g>
+          </mask>
+        </defs>
+        <rect width="32" height="36" style="fill: var(--engrave)" mask="url(#logo-perf)"/>
+        <rect x="5.5" y="5.5" width="21" height="25" fill="none" style="stroke: var(--engrave-ink)" stroke-width="0.8" opacity="0.5"/>
+        <use href="#i-maltese" x="9" y="11" width="14" height="14" style="color: var(--engrave-ink)"/>
+      </svg>
+      <span class="brand-name">Stamp Loupe</span>
+    </a>
+    <div class="top-right">
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button type="button" role="tab" id="tab-scan" aria-controls="view-scan" aria-selected="true"><svg class="icon tab-ico" aria-hidden="true" focusable="false"><use href="#i-camera"/></svg><span>Scan</span></button>
+        <button type="button" role="tab" id="tab-collection" aria-controls="view-collection" aria-selected="false" tabindex="-1"><svg class="icon tab-ico" aria-hidden="true" focusable="false"><use href="#i-album"/></svg><span>Collection</span> <span class="count" id="count">0</span></button>
+      </nav>
+      <button type="button" class="iconbtn" id="settings-btn" aria-label="Settings"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sliders"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="view-scan" role="tabpanel" aria-labelledby="tab-scan">
+    <div class="intro">
+      <h1 class="lede">What is this stamp worth?</h1>
+      <p class="lede-sub">Photograph a stamp, block or cover. Get an identification, a value with its sources, and a plan for selling it.</p>
+    </div>
+
+    <div class="scan-grid">
+      <div class="panel capture" id="capture">
+        <div class="field">
+          <span class="lbl" id="subject-lbl">What are you photographing?</span>
+          <div class="seg seg-wide" id="subject-seg" role="group" aria-labelledby="subject-lbl">
+            <button type="button" data-value="single" aria-pressed="true">Single stamp</button>
+            <button type="button" data-value="block" aria-pressed="false">Block or strip</button>
+            <button type="button" data-value="cover" aria-pressed="false">Cover or card</button>
+            <button type="button" data-value="page" aria-pressed="false">Album page</button>
+          </div>
+        </div>
+
+        <div class="shot" id="shot-front" data-side="front"></div>
+        <input type="file" accept="image/*" capture="environment" id="front-cam-input" class="vh" tabindex="-1" aria-hidden="true">
+        <input type="file" accept="image/*" id="front-file-input" class="vh" tabindex="-1" aria-hidden="true">
+
+        <div class="shot shot-back" id="shot-back" data-side="back"></div>
+        <input type="file" accept="image/*" capture="environment" id="back-cam-input" class="vh" tabindex="-1" aria-hidden="true">
+        <input type="file" accept="image/*" id="back-file-input" class="vh" tabindex="-1" aria-hidden="true">
+
+        <details class="more" id="tips">
+          <summary>Photo tips</summary>
+          <ul class="plain">
+            <li>Handle the stamp with tongs. Skin oils stain paper and gum.</li>
+            <li>Lay it flat on a plain dark card. Edges are found most reliably against black.</li>
+            <li>Use soft daylight from one side. Tilt the phone slightly if you see a bright spot.</li>
+            <li>Hold the phone flat above the stamp, about a hand's width away. Use 2x zoom if it will not focus.</li>
+            <li>For a whole album or stockbook page, choose Album page. Every stamp on it is found and sorted in one go, and you can then identify the promising ones on their own.</li>
+          </ul>
+        </details>
+
+        <details class="more" id="known">
+          <summary><span>Add what you know <em>optional</em></span></summary>
+          <div class="fields">
+            <div class="field"><label for="in-country">Country</label><input type="text" id="in-country" placeholder="Newfoundland" autocomplete="off"></div>
+            <div class="field">
+              <label for="in-perf">Perforation</label>
+              <input type="text" id="in-perf" placeholder="12, or 11 x 14" autocomplete="off">
+              <p class="hint">Count the holes along 2 cm of one edge. That count is the gauge. A stamp with no holes is imperforate.</p>
+            </div>
+            <div class="field">
+              <label for="in-wmk">Watermark</label>
+              <input type="text" id="in-wmk" placeholder="Crown, or none seen" autocomplete="off">
+              <p class="hint">Lay the stamp face down on black. A drop of watermark fluid, or a light behind it, can show the mark.</p>
+            </div>
+            <div class="field">
+              <label for="in-gum">Gum or use</label>
+              <select id="in-gum">
+                <option value="">Not sure</option>
+                <option>Mint never hinged</option>
+                <option>Mint hinged</option>
+                <option>Unused, no gum</option>
+                <option>Used</option>
+                <option>On cover or envelope</option>
+              </select>
+            </div>
+            <div class="field"><label for="in-notes">Notes</label><textarea id="in-notes" rows="2" placeholder="Came from my grandfather's album. Pencil marks on the back."></textarea></div>
+          </div>
+        </details>
+
+        <div class="settings-row">
+          <div class="field">
+            <label for="in-cur">Value in</label>
+            <select id="in-cur"><option>CAD</option></select>
+          </div>
+          <div class="field" id="depth-field">
+            <span class="lbl" id="mode-lbl">Depth</span>
+            <div class="seg" role="group" aria-labelledby="mode-lbl">
+              <button type="button" id="mode-thorough" aria-pressed="true">Thorough</button>
+              <button type="button" id="mode-fast" aria-pressed="false">Faster</button>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block btn-go" id="go" disabled>Identify stamp</button>
+        <p class="hint" id="go-hint">Add a photo of the front to begin.</p>
+        <div class="status" id="status" hidden>
+          <div class="perfbar think" id="perfbar"><i></i></div>
+          <div class="status-row"><span id="status-msg" role="status">Examining the stamp</span><span class="mono" id="elapsed">0:00</span></div>
+          <p class="hint" id="status-sub"></p>
+          <button type="button" class="btn btn-small" id="stop">Stop</button>
+        </div>
+        <p class="error" id="error" role="alert" hidden></p>
+        <p class="fine" id="fine"></p>
+      </div>
+
+      <div class="result-col" id="result"></div>
+    </div>
+  </section>
+
+  <section id="view-collection" role="tabpanel" aria-labelledby="tab-collection" hidden>
+    <div class="coll-head">
+      <div class="name-row">
+        <h1 class="coll-name" id="coll-name">Stamp collection</h1>
+        <button type="button" class="btn btn-small" id="rename" hidden>Rename</button>
+      </div>
+      <form class="rename-form" id="rename-form" hidden>
+        <label class="vh" for="rename-input">Collection name</label>
+        <input type="text" id="rename-input" maxlength="80" autocomplete="off">
+        <button type="submit" class="btn btn-primary btn-small">Save name</button>
+        <button type="button" class="btn btn-small" id="rename-cancel">Cancel</button>
+      </form>
+      <p class="stats" id="stats">Loading the collection</p>
+      <p class="viewonly" id="viewonly" hidden>View only. You can scan stamps here, but only the owner can add them to this collection.</p>
+    </div>
+
+    <div class="nudge" id="backup-nudge" hidden>
+      <p>Your collection lives only in this browser. Export a backup so you don't lose it.</p>
+      <button type="button" class="btn btn-small" id="backup-now">Back up now</button>
+    </div>
+
+    <div class="sell-summary" id="sell-summary" hidden></div>
+
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Search: Canada, 1859, Scott 15" aria-label="Search by country, year, catalogue number, or notes">
+      <select id="country" aria-label="Country"><option value="all">All countries</option></select>
+      <select id="sort" aria-label="Sort">
+        <option value="new">Newest first</option>
+        <option value="value">Highest value</option>
+        <option value="year">Oldest issue</option>
+        <option value="country">Country, A to Z</option>
+      </select>
+      <button type="button" class="btn" id="export" hidden>Export CSV</button>
+      <button type="button" class="btn" id="share-btn" aria-expanded="false" aria-controls="share-info">Share</button>
+    </div>
+    <div class="share-info" id="share-info" hidden></div>
+    <div class="chips" id="era-chips" role="group" aria-label="Filter by era"></div>
+    <div class="chips" id="status-chips" role="group" aria-label="Filter by status"></div>
+
+    <div class="grid" id="grid"></div>
+    <div class="nomatch" id="nomatch" hidden>
+      <p>No stamps match these filters.</p>
+      <button type="button" class="btn btn-small" id="clear-filters">Clear filters</button>
+    </div>
+    <div class="empty" id="empty" hidden>
+      <div class="ghosts" aria-hidden="true">
+        <div class="ph-stamp"><div class="perf"><div class="ph-inner"><svg class="ph-cross" focusable="false"><use href="#i-maltese"/></svg></div></div></div>
+        <div class="ph-stamp"><div class="perf"><div class="ph-inner"><svg class="ph-cross" focusable="false"><use href="#i-maltese"/></svg></div></div></div>
+        <div class="ph-stamp"><div class="perf"><div class="ph-inner"><svg class="ph-cross" focusable="false"><use href="#i-maltese"/></svg></div></div></div>
+      </div>
+      <h2 id="empty-title">Start your collection</h2>
+      <p id="empty-body">Scan a stamp, then choose Save to collection.</p>
+      <button type="button" class="btn btn-primary" id="empty-scan">Scan a stamp</button>
+    </div>
+  </section>
+</main>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="scrim" id="scrim"></div>
+  <div class="pane" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="pane-head">
+      <h2 class="pane-title" id="sheet-title">Stamp</h2>
+      <button type="button" class="btn btn-small" id="sheet-close">Close</button>
+    </div>
+    <div class="pane-body" id="sheet-body"></div>
+  </div>
+</div>
+
+<div class="sheet" id="settings" hidden>
+  <div class="scrim" id="settings-scrim"></div>
+  <div class="pane" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="pane-head">
+      <h2 class="pane-title" id="settings-title">Settings</h2>
+      <button type="button" class="btn btn-small" id="settings-close">Close</button>
+    </div>
+    <div class="pane-body settings-body" id="settings-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<!-- app:body:end -->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

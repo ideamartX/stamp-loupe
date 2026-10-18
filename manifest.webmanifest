@@ -1,0 +1,31 @@
+{
+  "id": "stamp-loupe",
+  "name": "Stamp Loupe",
+  "short_name": "Stamp Loupe",
+  "description": "Photograph a postage stamp, block or cover. Get an identification, a value with its sources, and a plan for selling it.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f8",
+  "theme_color": "#2b3ea6",
+  "categories": ["utilities", "lifestyle"],
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Scan a stamp", "short_name": "Scan", "url": "./?scan=single", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Scan a page", "short_name": "Page", "url": "./?scan=page", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Collection", "short_name": "Collection", "url": "./#collection", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ],
+  "share_target": {
+    "action": "./share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [{ "name": "photos", "accept": ["image/*"] }]
+    }
+  }
+}
